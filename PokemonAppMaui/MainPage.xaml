@@ -1,0 +1,76 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="PokemonAppMaui.MainPage"
+             x:DataType="local:MainPageViewModel"
+             xmlns:model ="clr-namespace:PokeApiNet;assembly=PokeApiNet"
+             xmlns:local="clr-namespace:PokemonAppMaui.ViewModels"
+             xmlns:converters="clr-namespace:PokemonAppMaui.Converter"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit">
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior EventName="Loaded"
+                                        Command="{Binding NextCommand}" />
+    </ContentPage.Behaviors>
+    
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <converters:FirstLetterUppercaseConverter x:Key="FirstLetterUppercaseConverter"/>
+            <converters:NameToColorConverter x:Key="NameToColorConverter"/>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid ColumnDefinitions="*" RowDefinitions="*,Auto">
+        <CollectionView ItemsSource="{Binding Pokemons}"  Grid.Row="0" 
+                        BackgroundColor="AliceBlue"
+                        RemainingItemsThresholdReachedCommand="{Binding NextCommand}"  
+                        RemainingItemsThreshold="25"
+                        ItemsUpdatingScrollMode="KeepScrollOffset">
+            <CollectionView.ItemTemplate >
+                <DataTemplate x:DataType="model:Pokemon">
+                    <Frame >
+                        <Frame.GestureRecognizers>
+                            <TapGestureRecognizer 
+                                CommandParameter="{Binding .}"
+                                Command="{Binding Source={RelativeSource AncestorType={x:Type local:MainPageViewModel} }, Path=GotoDetailsCommand}">
+                                
+                            </TapGestureRecognizer>
+                        </Frame.GestureRecognizers>
+                        <Grid ColumnDefinitions="3*,7*" 
+                                  ColumnSpacing="5">
+                            <Image Source="{Binding Sprites.FrontDefault}" Grid.Column="0" HeightRequest="200"  ></Image>
+                            <VerticalStackLayout Grid.Column="1">
+                                <Label Text="{Binding Id, StringFormat='#{0}'}" Grid.Column="0" VerticalOptions="Center" HorizontalOptions="Start" ></Label>
+                                <Label Text="{Binding Name, Converter={StaticResource FirstLetterUppercaseConverter}}" Grid.Column="2" 
+                                       VerticalOptions="Center" HorizontalOptions="Start" 
+                                       FontSize="Medium"></Label>
+                                <CollectionView ItemsSource="{Binding Types}" ItemsLayout="HorizontalList" >
+                                    <CollectionView.ItemTemplate>
+                                        <DataTemplate x:DataType="model:PokemonType">
+                                            <Frame Padding="10,5" BackgroundColor="{Binding Type.Name, Converter={StaticResource NameToColorConverter}}" CornerRadius="20" Margin="5,0,5,0">
+                                            
+                                                <Label Text="{Binding Type.Name}" ></Label>
+                                            
+                                            </Frame>
+                                        </DataTemplate>
+                                    </CollectionView.ItemTemplate>
+                                </CollectionView>
+                            
+                            </VerticalStackLayout>
+                        
+                        
+                        </Grid>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+
+
+
+        <Button Text="Siguiente"  IsEnabled="{Binding IsNotBusy}" Command="{Binding NextCommand}" Grid.Row="1"></Button>
+
+        <ActivityIndicator IsRunning="{Binding IsBusy}" Grid.Row="0" VerticalOptions="Start" HorizontalOptions="End" MaximumHeightRequest="50"/>
+
+    </Grid>
+
+</ContentPage>
