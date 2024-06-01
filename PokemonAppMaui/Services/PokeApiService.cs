@@ -34,5 +34,15 @@ namespace PokemonAppMaui.Services
 
             return pokemons;
         }
+
+        public async Task<PokemonSpecies> GetSpecies(Pokemon pokemon)
+        {
+            return await client.GetResourceAsync(pokemon.Species);
+        }
+
+        public async Task<IEnumerable<Move>> GetMoves(Pokemon pokemon)
+        {
+            return await client.GetResourceAsync(pokemon.Moves.Select(pokemon => pokemon.Move));
+        }
     }
 }

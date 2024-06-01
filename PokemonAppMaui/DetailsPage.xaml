@@ -2,7 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="PokemonAppMaui.DetailsPage"
-             Title="DetailsPage"
+             Title="{Binding Pokemon.Name, Converter={StaticResource FirstLetterUppercaseConverter}}"
              x:DataType="local:DetailsViewModel"
              xmlns:model ="clr-namespace:PokeApiNet;assembly=PokeApiNet"
              xmlns:local="clr-namespace:PokemonAppMaui.ViewModels"
@@ -15,14 +15,43 @@
         </ResourceDictionary>
     </ContentPage.Resources>
 
-    <VerticalStackLayout >
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior EventName="Loaded"
+                                    Command="{Binding GetSpeciesCommand}" />
+        <toolkit:EventToCommandBehavior EventName="Loaded"
+                            Command="{Binding GetMovesCommand}" />
+    </ContentPage.Behaviors>
+
+    <ScrollView>
+    <VerticalStackLayout Margin="{OnIdiom '5,0,5,0', Desktop='50,0,50,0'}">
+        
+        <Label Text="{Binding Generation}" HorizontalOptions="End"></Label>
         <Image Source="{Binding Pokemon.Sprites.FrontDefault}" Grid.Column="0" HeightRequest="300"  VerticalOptions="Center"  HorizontalOptions="Center"></Image>
-        <HorizontalStackLayout HorizontalOptions="Center">
+        <HorizontalStackLayout HorizontalOptions="Center" Margin="0,20,0,20">
             <Label Text="{Binding Pokemon.Id, StringFormat='#{0}'}" FontSize="Header" Grid.Column="0" VerticalOptions="Center" HorizontalOptions="Start" Margin="0,0,30,0" ></Label>
             <Label Text="{Binding Pokemon.Name, Converter={StaticResource FirstLetterUppercaseConverter}}" Grid.Column="2" 
                                        VerticalOptions="Center" HorizontalOptions="Start" 
                                        FontSize="Header"></Label>
+            
         </HorizontalStackLayout>
+
+            <Label Text="{Binding PokedexEntry}" Margin="0,20,0,20"></Label>
+            <Label Text="Movimientos: " Margin="0,20,0,0"></Label>
+        <CollectionView ItemsSource="{Binding Moves}"  >
+
+            <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Grid ColumnDefinitions="*,*,*" FlowDirection="LeftToRight" >
+                            <Frame HeightRequest="60">
+                                <Label Text="{Binding .}"  FontSize="Micro"></Label>
+                            </Frame>
+                        </Grid>
+                        
+                         
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
         
     </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>
